@@ -1,0 +1,31 @@
+button .material-icons {
+	font-size:18px;
+	margin-top:3px;
+}
+md-card > img  {
+	height:auto!important;
+}
+.flex-30, .layout-row>.flex-30 {
+	max-width: 32%
+}
+
+#group {
+	margin-top: 42px;
+}
+
+.product.ng-enter, .product.ng-move {
+	transition: 0.4s all;
+	opacity: 0;
+}
+
+.product.ng-enter.ng-enter-active,.product.ng-move.ng-move-active {
+	opacity: 1;
+}
+.products.ng-leave {
+	animation:0.4s fade_products;
+}
+
+@keyframes fade_products {
+	from {opacity: 1;}
+	to {opacity: 0;}
+}

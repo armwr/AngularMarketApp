@@ -1,0 +1,152 @@
+    <md-toolbar md-scroll-shrink>
+      <div class="md-toolbar-tools"> 
+        <h3>{{ message }}</h3>
+
+        <p><strong>CS:GO Skins</strong></p>
+        
+        <md-button ng-click="vm.openSidebar()">
+          <md-icon>note_add</md-icon>
+            Add a new skin
+        </md-button>
+
+		 <md-button ng-click="showFilters = !showFilters">
+          <md-icon>search</md-icon>
+            Search
+        </md-button>
+
+      </div>
+
+    </md-toolbar>
+
+    <div class="filters" layout="row" layout-align="center center" ng-show="showFilters">
+
+      <md-input-container id="group">
+        <label>Enter a Search Term</label>
+        <input ng-model="productFilter" type="text">
+      </md-input-container>
+
+      <md-input-container>
+        <label>Category</label>
+        <md-select ng-model="category">
+          <md-option ng-repeat="category in vm.categories" value="{{ category }}">  
+            {{ category }}
+          </md-option>
+        </md-select>
+      </md-input-container>
+
+       <md-input-container>
+      		<md-button class="md-warn" ng-click="productsFilter = ''; category ='' ">
+      		Clear
+      		</md-button>
+      </md-input-container>
+
+    </div>
+      
+
+    <md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="left">
+      <md-toolbar class="md-theme-light">
+        <h1 class="md-toolbar-tools">{{ sidebarTitle }}</h1>
+      </md-toolbar>
+      <md-content layout-padding>
+        <form>
+          <md-input-container>
+            <label for="title">Title</label>
+            <input type="text" id="title"
+                   ng-model="product.title" md-autofocus>
+          </md-input-container>
+          <md-input-container>
+            <label for="price">Price</label>
+            <input type="text" id="price"
+                 ng-model="product.price">
+          </md-input-container>
+          <md-input-container>
+            <label for="description">Description</label>
+            <textarea type="text" id="description"
+                  ng-model="product.description">
+            </textarea>
+          </md-input-container>
+          <md-input-container>
+            <label for="image">Image Link</label>
+            <input type="text" id="image"
+                  ng-model="product.image">
+          </md-input-container>
+          <md-button ng-if="!editing" ng-click="vm.saveProduct(product)" class="md-primary">
+            Save
+          </md-button>
+          <md-button ng-if="editing" ng-click="vm.saveEdit()" class="md-primary">
+            Save Edit
+          </md-button>
+          <md-button ng-click="vm.closeSidebar()" class="md-warn">
+            Cancel
+          </md-button>
+        </form>
+      </md-content>
+    </md-sidenav>
+
+    <md-content class="md-padding" layout="row" layout-wrap>
+      <md-card ng-repeat="product in vm.products | 
+      filter: productFilter | 
+      filter: category"
+               flex="30"
+               class="product">
+        <img ng-src="{{ product.image }}" class="md-card-image">
+        <md-card-content>
+          <div class="product-info" ng-show="!showContact">
+            <h2 class="md-title">{{ product.title }}</h2>
+            <h3>{{ product.price | currency }}</h3>
+            <p>{{ product.description }}</p>
+          </div>
+          
+          <div class="product-contact" ng-show="showContact">
+            <p><md-icon>account_circle</md-icon> {{ product.contact.name }}</p>
+            <p><md-icon>phone</md-icon> {{ product.contact.number }}</p>
+            <p><md-icon>email</md-icon> {{ product.contact.email }}</p>
+          </div>
+
+          <div layout="row">
+            <md-button 
+              ng-click="showContact = true"
+              ng-show="!showContact">
+              Contact
+            </md-button>
+
+            <md-button 
+              ng-click="showContact = false"
+              ng-show="showContact">
+              Details
+            </md-button>
+
+            <md-button 
+              ng-click="showAdmin = true"
+              ng-show="!showAdmin">
+              Admin Panel
+            </md-button>
+
+            <md-button 
+              ng-click="showAdmin = false"
+              ng-show="showAdmin">
+              Close
+            </md-button>
+          </div>
+
+          <div class="product-admin" ng-if="showAdmin">
+            <h3>Admin Panel</h3>
+            <div layout="row">
+              <md-button 
+                class="md-primary"
+				ng-click="vm.editProduct(product)"
+                >
+                Edit
+              </md-button>
+              <md-button 
+                class="md-warn"
+                ng-click="vm.deleteProduct($event, product)"
+                >
+                Delete
+              </md-button>
+            </div>
+          </div>
+
+        </md-card-content>
+      </md-card>
+    </md-content>
