@@ -7,7 +7,7 @@
 	.controller('productsCtrl', productsCtrl) 
 
 
-	function productsCtrl ($scope, $http, $mdSidenav, $mdToast, $mdDialog) { 
+	function productsCtrl ($scope, $http, $mdSidenav, $mdToast, $mdDialog){ 
 
 		var vm = this;
 
