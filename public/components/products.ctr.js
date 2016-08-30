@@ -4,7 +4,10 @@
 	
 	angular
 	.module('ngProducts')
-	.controller('productsCtrl', function($scope, $http, productsFactory, $mdSidenav, $mdToast, $mdDialog) {
+	.controller('productsCtrl', productsCtrl) 
+
+
+	function productsCtrl ($scope, $http, $mdSidenav, $mdToast, $mdDialog) { 
 
 		var vm = this;
 
@@ -15,16 +18,11 @@
 		vm.saveEdit = saveEdit;
 		vm.deleteProduct = deleteProduct;
 
-		vm.products;
 		vm.product;
+		vm.products;
 		vm.categories;
 		vm.editing;
-
-
-		productsFactory.getProducts().then(function(products){
-			vm.products = products.data;
-			vm.categories = getCategories(vm.products);
-		})
+		vm.formData;
 
 
 		var contact = {
@@ -41,20 +39,10 @@
 			$mdSidenav('left').close();
 		}
 
-		function saveProduct (product) {
-			if(product) {
-				product.contact = contact;
-				vm.products.push(product);
-				vm.product = {};
-				closeSidebar();
-				showToast('Product saved!')
-			}
-		}
-
 		function editProduct(product) {
 			vm.editing = true;
 			openSidebar();
-			$scope.product = product;
+			vm.product = product;
 		}
 
 		function saveEdit() {
@@ -64,17 +52,6 @@
 			showToast('Edit saved');
 		}
 
-		function deleteProduct(event, product) {
-			var confirm = $mdDialog.confirm()
-			.title('Are you sure you want to delete ' + product.title + ' ?')
-			.ok('Yes')
-			.cancel('No')
-			.targetEvent(event);
-			$mdDialog.show(confirm).then(function() {
-				var index = vm.products.indexOf(product);
-				vm.products.splice(index, 1)
-			},function() {})
-		}
 
 		function showToast(message) {
 			$mdToast.show (
@@ -85,17 +62,60 @@
 				);
 		}
 
-		function getCategories(products) {
+		vm.formData = {};
 
-			var categories = [];
 
-			angular.forEach(products, function(item){
-				angular.forEach(item.categories, function(category){
-					categories.push(category);
-				})
-			})
+    // when landing on the page, get all products and show them
+    $http.get('/api/products')
+    .success(function(data) {
+    	$scope.products = data;
+    	console.log(data);
+    	console.log("I've got data");
+    })
+    .error(function(data) {
+    	console.log('Error: ' + data);
+    });
 
-			return _.uniq(categories);
-		}
-	})
+
+    // delete a todo after checking it
+    function deleteProduct(id) {
+    	var confirm = $mdDialog.confirm()
+    	.title('Are you sure you want to delete ?')
+    	.ok('Yes')
+    	.cancel('No')
+    	.targetEvent(event);
+    	$mdDialog.show(confirm).then(function() {
+
+    		$http.delete('/api/products/' + id)
+    		.success(function(data) {
+    			$scope.products = data;
+    			console.log(data);
+    		})
+    		.error(function(data) {
+    			console.log('Error: ' + data);
+    		});
+
+    	},function() {})
+
+    };
+
+    //when submitting the add form, send the text to the node API
+    function saveProduct() {
+
+    	$http.post('/api/products', $scope.formData)
+    	.success(function(data) {
+                $scope.formData = {}; // clear the form so our user is ready to enter another
+                $scope.products = data;
+                console.log(data);
+            })
+    	.error(function(data) {
+    		console.log('Error: ' + data);
+    	});
+
+    	closeSidebar();
+    	showToast('Product saved!')
+
+    };
+
+}
 })()
