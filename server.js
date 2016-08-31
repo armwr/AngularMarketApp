@@ -4,8 +4,18 @@ var mongoose = require('mongoose')
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 var morgan = require('morgan'); 
+var Shchema = mongoose.Schema;
 
 var port = process.env.PORT || 3000;
+
+var productSchema = mongoose.Schema({
+	title: String,
+	price: Number,
+	description: String,
+	image: String
+});
+
+var Product = mongoose.model('Product', productSchema) 
 
 
 mongoose.connect('mongodb://Boris:dmx139@ds019816.mlab.com:19816/newangularmarket');
@@ -17,21 +27,6 @@ app.use(bodyParser.json());                                     // parse applica
 app.use(bodyParser.json({ type: 'application/vnd.api+json' })); // parse application/vnd.api+json as json
 app.use(methodOverride());
 
-
-var Product = mongoose.model('Product', {
-	title: String,
-	price: Number,
-	description: String,
-	image: String
-	// contact:[{
-	// 	name: String,
-	// 	email: String,
-	// 	info: String
-	// }],
-	// categories: [
-	// 	String
-	// ],
-});
 
 app.get('/api/products', function(req, res) {
 
@@ -54,16 +49,7 @@ app.post('/api/products', function(req, res) {
     	title : req.body.title,
     	price: req.body.price,
     	description: req.body.description,
-    	image: req.body.image,
-    	// contact: [{
-    	// 	name: req.body.name,
-    	// 	email: req.body.email,
-    	// 	info: req.body.info
-    	// }],
-    	// categories: [
-    	// 	req.body.String
-    	// ], 
-    	done : false
+    	image: req.body.image
     }, function(err, product) {
     	if (err)
     		res.send(err);
@@ -96,10 +82,32 @@ app.delete('/api/products/:product_id', function(req, res) {
 
 });
 
+
+app.put('/api/products', function(req, res) {
+
+	Product.findById({
+		title : req.body.title,
+		price: req.body.price,
+		description: req.body.description,
+		image: req.body.image
+	}, function(err, product) {
+		if (err)
+			res.send(err);
+
+    // get and return all the products after you create another
+    Product.find(function(err, products) {
+    	if (err)
+    		res.send(err)
+    	res.json(products);
+    });
+});
+
+});
+
+
+
 app.get('*', function(req, res) {
         res.sendfile('./public/index.html'); // load the single view file (angular will handle the page changes on the front-end)
     });
 
-app.listen(port, function() {
-	console.log("Server running on port 3000")
-});
+app.listen(port);

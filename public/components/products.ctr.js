@@ -22,7 +22,6 @@
 		vm.products;
 		vm.categories;
 		vm.editing;
-		vm.formData;
 
 
 		var contact = {
@@ -40,17 +39,11 @@
 		}
 
 		function editProduct(product) {
-			vm.editing = true;
+			$scope.editing = true;
 			openSidebar();
-			vm.product = product;
+			$scope.product = product;
 		}
 
-		function saveEdit() {
-			vm.editing = false;
-			vm.product = {};
-			closeSidebar();
-			showToast('Edit saved');
-		}
 
 
 		function showToast(message) {
@@ -62,7 +55,7 @@
 				);
 		}
 
-		vm.formData = {};
+		vm.product = {};
 
 
     // when landing on the page, get all products and show them
@@ -102,9 +95,9 @@
     //when submitting the add form, send the text to the node API
     function saveProduct() {
 
-    	$http.post('/api/products', $scope.formData)
+    	$http.post('/api/products', $scope.product)
     	.success(function(data) {
-                $scope.formData = {}; // clear the form so our user is ready to enter another
+                $scope.product = {}; // clear the form so our user is ready to enter another
                 $scope.products = data;
                 console.log(data);
             })
@@ -115,7 +108,26 @@
     	closeSidebar();
     	showToast('Product saved!')
 
-    };
+    }; 
+
+    function saveEdit(id) {
+    	$scope.editing = false;
+
+    	$http.update('/api/products', $scope.product)
+    	.success(function(data) {
+                $scope.product = {}; // clear the form so our user is ready to enter another
+                $scope.products = data;
+                console.log(data);
+            })
+    	.error(function(data) {
+    		console.log('Error: ' + data);
+    	});
+
+
+    	$scope.product = {};
+    	closeSidebar();
+    	showToast('Edit saved');
+    }
 
 }
 })()

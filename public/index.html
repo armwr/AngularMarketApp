@@ -65,23 +65,23 @@
           <md-input-container>
             <label for="title">Title</label>
             <input type="text" id="title"
-                   ng-model="formData.title" md-autofocus>
+                   ng-model="product.title" md-autofocus>
           </md-input-container>
           <md-input-container>
             <label for="price">Price</label>
             <input type="text" id="price"
-                 ng-model="formData.price">
+                 ng-model="product.price">
           </md-input-container>
           <md-input-container>
             <label for="description">Description</label>
             <textarea type="text" id="description"
-                  ng-model="formData.description">
+                  ng-model="product.description">
             </textarea>
           </md-input-container>
           <md-input-container>
             <label for="image">Image Link</label>
             <input type="text" id="image"
-                  ng-model="formData.image">
+                  ng-model="product.image">
           </md-input-container>
           <md-button ng-if="!editing" ng-click="vm.saveProduct()" class="md-primary">
             Save
