@@ -5,12 +5,14 @@ var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 var morgan = require('morgan'); 
 var Shchema = mongoose.Schema;
+var mongojs = require('mongojs');
+var db = mongojs('mongodb://Boris:dmx139@ds019816.mlab.com:19816/newangularmarket', ['products'])
 
 var port = process.env.PORT || 3000;
 
 var productSchema = mongoose.Schema({
 	title: String,
-	price: Number,
+	price: String,
 	description: String,
 	image: String
 });
@@ -18,7 +20,7 @@ var productSchema = mongoose.Schema({
 var Product = mongoose.model('Product', productSchema) 
 
 
-mongoose.connect('mongodb://Boris:dmx139@ds019816.mlab.com:19816/newangularmarket');
+// mongoose.connect('mongodb://Boris:dmx139@ds019816.mlab.com:19816/newangularmarket');
 
 app.use(express.static(__dirname + '/public'));                 
 app.use(morgan('dev'));                                         // log every request to the console
@@ -27,82 +29,59 @@ app.use(bodyParser.json());                                     // parse applica
 app.use(bodyParser.json({ type: 'application/vnd.api+json' })); // parse application/vnd.api+json as json
 app.use(methodOverride());
 
-
+//GET
 app.get('/api/products', function(req, res) {
 
     // use mongoose to get all products in the database
-    Product.find(function(err, products) {
-
-            // if there is an error retrieving, send the error. nothing after res.send(err) will execute
-            if (err)
-            	res.send(err)
+    db.products.find(function(err, products) {
 
             res.json(products); // return all products in JSON format
         });
 });
 
-// create todo and send back all products after creation
+
+//POST
 app.post('/api/products', function(req, res) {
 
-    // create a product, information comes from AJAX request from Angular
-    Product.create({
-    	title : req.body.title,
-    	price: req.body.price,
-    	description: req.body.description,
-    	image: req.body.image
-    }, function(err, product) {
-    	if (err)
-    		res.send(err);
+	console.log(req.body);
 
-    // get and return all the products after you create another
-    Product.find(function(err, products) {
-    	if (err)
-    		res.send(err)
-    	res.json(products);
-    });
-});
+	db.products.insert(req.body,function(err, products){
+		res.json(products)
+	})
+
 
 });
 
-// delete
+
+// DELETE
 app.delete('/api/products/:product_id', function(req, res) {
-	Product.remove({
-		_id : req.params.product_id
-	}, function(err, product) {
-		if (err)
-			res.send(err);
 
-	// get and return all the products after you create another
-	Product.find(function(err, products) {
-		if (err)
-			res.send(err)
+	var id = req.params.product_id;
+	console.log(id);
+
+	db.products.remove({_id: mongojs.ObjectId(id)}, function(err, products) {
 		res.json(products);
-	});
-});
+	})
+
+	console.log('Product deleted')
 
 });
 
 
-app.put('/api/products', function(req, res) {
+//EDIT
+app.put('/api/products/:product_id', function(req, res) {
 
-	Product.findById({
-		title : req.body.title,
-		price: req.body.price,
-		description: req.body.description,
-		image: req.body.image
-	}, function(err, product) {
-		if (err)
-			res.send(err);
+	var id = req.params.product_id;
 
-    // get and return all the products after you create another
-    Product.find(function(err, products) {
-    	if (err)
-    		res.send(err)
-    	res.json(products);
-    });
+
+	db.products.findAndModify({query: {_id:mongojs.ObjectId(id)},
+		update:{$set: {title : req.body.title, price: req.body.price, 
+			description: req.body.description, image: req.body.image }},
+			new: true}, function(err,doc) {
+				res.json(doc);
+			});
 });
 
-});
 
 
 

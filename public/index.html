@@ -86,7 +86,7 @@
           <md-button ng-if="!editing" ng-click="vm.saveProduct()" class="md-primary">
             Save
           </md-button>
-          <md-button ng-if="editing" ng-click="vm.saveEdit()" class="md-primary">
+          <md-button ng-if="editing" ng-click="vm.saveEdit(product._id)" class="md-primary">
             Save Edit
           </md-button>
           <md-button ng-click="vm.closeSidebar()" class="md-warn">
