@@ -33,3 +33,22 @@ md-card > img  {
 md-input-container {
 	width: 200px!important;
 }
+.title-csgo {
+	margin-bottom: 0;
+	float: left;
+	padding-top: 4px;
+}
+
+/*Auth form*/
+.md-padding.layout-column {
+	padding-bottom: 0;
+}
+.signup-button {
+	padding-bottom: 10px;
+}
+.hello-logout {
+	margin: 0;
+}
+.logout {
+	font-size: 12px;
+}

@@ -6,19 +6,23 @@ var methodOverride = require('method-override');
 var morgan = require('morgan'); 
 var Shchema = mongoose.Schema;
 var mongojs = require('mongojs');
-var db = mongojs('mongodb://Boris:dmx139@ds019816.mlab.com:19816/newangularmarket', ['products'])
+var db = mongojs('mongodb://Boris:dmx139@ds019816.mlab.com:19816/newangularmarket', ['products']);
+var usersdb = mongojs('mongodb://Boris:dmx139@ds019816.mlab.com:19816/newangularmarket', ['users']);
+var bcrypt = require('bcryptjs');
+var jwt = require('jwt-simple');
+
+var JWT_SECRET = 'secretProduct';
 
 var port = process.env.PORT || 3000;
 
 var productSchema = mongoose.Schema({
 	title: String,
-	price: String,
+	price: Number,
 	description: String,
 	image: String
 });
 
 var Product = mongoose.model('Product', productSchema) 
-
 
 // mongoose.connect('mongodb://Boris:dmx139@ds019816.mlab.com:19816/newangularmarket');
 
@@ -32,13 +36,11 @@ app.use(methodOverride());
 //GET
 app.get('/api/products', function(req, res) {
 
-    // use mongoose to get all products in the database
-    db.products.find(function(err, products) {
+	db.products.find(function(err, products) {
+		res.json(products);
+	});
 
-            res.json(products); // return all products in JSON format
-        });
 });
-
 
 //POST
 app.post('/api/products', function(req, res) {
@@ -49,9 +51,7 @@ app.post('/api/products', function(req, res) {
 		res.json(products)
 	})
 
-
 });
-
 
 // DELETE
 app.delete('/api/products/:product_id', function(req, res) {
@@ -67,22 +67,66 @@ app.delete('/api/products/:product_id', function(req, res) {
 
 });
 
-
 //EDIT
 app.put('/api/products/:product_id', function(req, res) {
 
 	var id = req.params.product_id;
 
-
 	db.products.findAndModify({query: {_id:mongojs.ObjectId(id)},
 		update:{$set: {title : req.body.title, price: req.body.price, 
-			description: req.body.description, image: req.body.image }},
+			description: req.body.description, image: req.body.image,
+			categories: [ req.body.categories] }},
 			new: true}, function(err,doc) {
 				res.json(doc);
 			});
 });
 
 
+//POST USER
+app.post('/users', function(req, res) {
+
+	console.log(req.body);
+
+	bcrypt.genSalt(10, function(err, salt) {
+
+		console.log(salt);
+
+		bcrypt.hash(req.body.password, salt, function(err, hash) {
+			var newUser = {
+				username: req.body.username,
+				password: hash
+			};
+
+			console.log(hash);
+
+			usersdb.users.insert(newUser, function(err, products){
+				res.json(products)
+			});
+
+		});
+
+	});
+});
+
+//PUT USER
+app.put('/users/signin', function(req, res) {
+
+	console.log(req.body);
+
+	usersdb.users.findOne({username: req.body.username}, function(err, user) {
+		if(user != null) {
+			bcrypt.compare(req.body.password, user.password, function(err, result) {
+				if (result) {
+					var token = jwt.encode(user, JWT_SECRET);
+					return res.json({token: token});
+				}
+				else {
+					return res.status(400).send();
+				}
+			});
+		}
+	});
+});
 
 
 app.get('*', function(req, res) {

@@ -5,12 +5,12 @@
 	.module('ngProducts')
 	.factory('productsFactory', function($http){
 
-		function getProducts() {
+		function getNewProducts() {
 			return $http.get('mock/data.json');
 		}
 		
 		return {
-			getProducts: getProducts
+			getNewProducts: getNewProducts
 		}
 
 

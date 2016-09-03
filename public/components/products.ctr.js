@@ -7,7 +7,7 @@
 	.controller('productsCtrl', productsCtrl) 
 
 
-	function productsCtrl ($scope, $http, $mdSidenav, $mdToast, $mdDialog) { 
+	function productsCtrl ($rootScope, $scope, $http, $mdSidenav, $mdToast, $mdDialog, $cookies, $location) {  //productsFactory
 
 		var vm = this;
 
@@ -18,18 +18,20 @@
 		vm.saveEdit = saveEdit;
 		vm.deleteProduct = deleteProduct;
 		vm.getProducts = getProducts;
+		 // vm.getCategories = getCategories;
 
-		vm.product;
-		vm.products;
-		vm.categories;
-		vm.editing;
+		 vm.product;
+		 vm.products;
+		 vm.categories;
+		 vm.editing;
 
 
-		var contact = {
-			name: "Lysenko Volodymyr",
-			number: "(555) 555-5555",
-			email: 'armwr91@gmail.com'
-		}
+
+		// var contact = {
+		// 	name: "Lysenko Volodymyr",
+		// 	number: "(555) 555-5555",
+		// 	email: 'armwr91@gmail.com'
+		// }
 
 		function openSidebar() {
 			$mdSidenav('left').open();
@@ -56,18 +58,39 @@
 				);
 		}
 
-		$scope.product = {};
+		//CATEGORIES(Only frontend)
 
+		// productsFactory.getNewProducts().then(function(products) {
+		// 	$scope.products = products.data;
+
+		// 	$scope.categories = getNewProducts($scope.products);
+		// 	console.log($scope.categories);
+		// })
+
+		// function getNewProducts(products) {
+
+		// 	var categories = [];
+
+		// 	angular.forEach(products, function(item) {
+		// 		angular.forEach(item.categories, function(category){
+		// 			categories.push(category);
+		// 		})
+		// 	})
+
+		// 	return _.uniq(categories);
+		// }
+
+		vm.product = {};
 
     //GET
     function getProducts() {
     	$http.get('/api/products').success(function(response) {
-    		console.log("I've got products")
+    		console.log("I've got products");
     		$scope.products = response;
     	})
     }
-
     getProducts();
+
 
     //POST
     function saveProduct() {
@@ -118,7 +141,44 @@
     	showToast('Edit saved');
     }
 
+	//SignIn
+	$scope.signin = function() {
+		$http.put('/users/signin', {username: $scope.username, password: $scope.password})
+		.then(function(res) {
+			console.log(res.data.token);
+			$cookies.put('token', res.data.token);
+			$cookies.put('currentUser', $scope.username);
+			$rootScope.token = res.data.token;
+			$rootScope.currentUser = $scope.username;
+			alert('successfully signed in');
+			$location.path('/products');
+			$rootScope.mainContent = false;
+		}, function(err) {
+			alert('Wrong user or password');
+		})
+	}
+
+	//SignUP
+	$scope.submitSignup = function() {
+		var newUser = {
+			username: $scope.username,
+			password: $scope.password
+		}
+
+		$http.post('/users', newUser).then(function() {
+			alert('User successfully created!');
+		})
+	}
+
+	//Logout
+	$scope.logout = function() {
+		$cookies.remove('token');
+		$cookies.remove('currentUser');
+		$rootScope.token = null;
+		$rootScope.currentUser = null;
+	}
 
 }
+
 
 })()

@@ -1,0 +1,20 @@
+<div layout="column" layout-align="center center" layout-fill>
+	<div class="loginBox md-whiteframe-z1" layout="column">
+		<md-toolbar>
+			<h2 class="md-toolbar-tools"><span>Sign up here</span></h2>
+		</md-toolbar>
+		<md-content class="md-padding", layout="column">
+	      	<md-input-container class="md-block">
+		        <label>Username</label>
+		        <input type="text" size="30" ng-model="username">
+		    </md-input-container>
+		    <md-input-container class="md-block">
+		        <label>Password</label>
+		        <input type="password" size="30" ng-model="password">
+			</md-input-container>
+        </md-content>
+        <div layout="row" layout-align="center center" class="signup-button">
+        	<md-button href="#/signin" class="md-raised md-primary" ng-click="submitSignup()">Sign up</md-button>
+        </div>
+	</div>
+</div>
