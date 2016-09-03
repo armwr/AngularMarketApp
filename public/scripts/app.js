@@ -7,7 +7,7 @@
 			$rootScope.currentUser = $cookies.get('currentUser');
 		}
 	})
-	.config(function ($mdThemingProvider, $stateProvider) {
+	.config(function ($mdThemingProvider, $stateProvider, $urlRouterProvider) {
 
 		$mdThemingProvider.theme('default')
 		.primaryPalette('teal')
@@ -29,7 +29,8 @@
 			url:'/signup',
 			templateUrl: '/components/signup.tpl.html',
 			controller: 'productsCtrl as vm'
-		});
+		})
+		$urlRouterProvider.otherwise("/signin");
 
 	})
 })()
